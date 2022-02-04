@@ -57,7 +57,6 @@ const ImageCircle = styled.div`
   margin: 4px;
   background-image: url("${(props) => props.src}");
   background-size: cover;
-  border: 1px solid black;
 `;
 
 export default Image;
