@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { Grid, Text, Button } from '../elements';
 import { getCookie, deleteCookie } from '../shared/Cookie';
 
 const Header = (props) => {
-  const navigate = useNavigate();
-
   const [is_login, setIsLogin] = useState(false);
 
   useEffect(() => {
@@ -54,14 +51,14 @@ const Header = (props) => {
           <Button 
             text="로그인"
             _onClick={() => {
-              navigate('/login');
+              console.log("로그인");
             }}
           >
           </Button>
           <Button 
             text="회원가입"
             _onClick={() => {
-              navigate('/signup');
+              console.log("회원가입");
             }}
           >
           </Button>
