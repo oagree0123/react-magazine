@@ -21,7 +21,7 @@ const Grid = (props) => {
   );
 };
 
-Grid.defaultPorps = {
+Grid.defaultProps = {
   children: null,
   is_flex: false,
   width: "100%",
@@ -31,7 +31,7 @@ Grid.defaultPorps = {
 };
 
 const GridBox = styled.div`
-  width: ${(props) => props.width};
+  width: ${(props) => (props.width)};
   height: 100%;
   box-sizing: border-box;
   ${(props) => props.padding ? `padding: ${props.padding};` : ""}
