@@ -1,23 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { Grid, Text, Button } from '../elements';
-import { getCookie, deleteCookie } from '../shared/Cookie';
+import { actionCreators as userActions } from '../redux/modules/user';
+import { history } from '../redux/configStroe';
+import { apiKey } from '../shared/firebase';
 
 const Header = (props) => {
-  const [is_login, setIsLogin] = useState(false);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    let cookie=getCookie("user_id");
-    console.log(cookie);
+  const _session_key = `firebase:authUser:${apiKey}:[DEFAULT]`;
 
-    if(cookie) {
-      setIsLogin(true);
-    }else {
-      setIsLogin(false);
-    }
-  }, []);
+  const is_login = useSelector((state) => state.user.is_login);
+  const is_session = sessionStorage.getItem(_session_key)? true : false;
 
-  if(is_login) {
+  if(is_login && is_session) {
     return (
       <>
         <Grid is_flex padding="4px 16px">
@@ -31,7 +28,7 @@ const Header = (props) => {
             <Button 
               text="로그아웃"
               _onClick={() => {
-                deleteCookie("user_id");
+                dispatch(userActions.logoutFB());
               }}
             ></Button>
           </Grid>
@@ -39,7 +36,7 @@ const Header = (props) => {
       </>
     );
   }
-
+  
   return (
     <>
       <Grid is_flex padding="4px 16px">
@@ -51,14 +48,14 @@ const Header = (props) => {
           <Button 
             text="로그인"
             _onClick={() => {
-              console.log("로그인");
+              history.push('/login');
             }}
           >
           </Button>
           <Button 
             text="회원가입"
             _onClick={() => {
-              console.log("회원가입");
+              history.push('/signup');
             }}
           >
           </Button>
@@ -66,6 +63,7 @@ const Header = (props) => {
       </Grid>
     </>
   );
+
 };
 
 Header.defaultProps = {

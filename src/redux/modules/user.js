@@ -1,17 +1,27 @@
 import { createAction, handleActions } from 'redux-actions';
 import { produce } from 'immer';
+import { 
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithEmailAndPassword,
+  setPersistence, 
+  browserSessionPersistence,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
 
+import { auth } from '../../shared/firebase';
 import { setCookie, getCookie, deleteCookie } from "../../shared/Cookie"
 
 // actions
-const LOG_IN = "LOG_IN";
 const LOG_OUT = "LOG_OUT";
 const GET_USER = "GET_USER";
+const SET_USER = "SET_USER";
 
 // action creators
-const logIn = createAction(LOG_IN, (user) => ({user}));
-const logOut = createAction(LOG_OUT, (user) => ({user}));
-const getUser = createAction(GET_USER, (user) => ({user}));
+const logOut = createAction(LOG_OUT, (user) => ({ user }));
+const getUser = createAction(GET_USER, (user) => ({ user }));
+const setUser = createAction(SET_USER, (user) => ({ user }));
 
 // initialState
 const initialState = {
@@ -19,15 +29,114 @@ const initialState = {
   is_login: false,
 };
 
+const user_initial = {
+  user_name: "ohyes",
+}
+
+// middleware actions
+const loginFB = (id, pwd) => {
+  return function (dispatch, getState, {history}) {
+    // miantain login state
+    setPersistence(auth, browserSessionPersistence)
+    .then((res) => {
+       // signin with email password
+      signInWithEmailAndPassword(auth, id, pwd)
+      .then((user) => {
+        console.log("로그인 성공!");
+        console.log(user);
+        dispatch(setUser({
+          id: id,
+          user_name: user.user.displayName,
+          user_profile: '',
+          uid: user.user.uid,
+        }));
+
+        history.push('/');
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+        console.log(errorCode, errorMessage);
+      });
+    })
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+
+      console.log(errorCode, errorMessage);
+    });
+  }
+}
+
+const signupFB = (id, pwd, user_name) => {
+  return function (dispatch, getState, {history}){
+    createUserWithEmailAndPassword(auth, id, pwd)
+    .then((user) => {
+      console.log(user);
+      
+      updateProfile(auth.currentUser, {
+        displayName: user_name,
+      }).then(() => {
+        dispatch(setUser({
+          id: id,
+          user_name: user_name,
+          user_profile: '',
+          uid: user.user.uid,
+        }));
+        history.push('/');
+      }).catch((error) => {
+        console.log(error);
+      });
+
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+
+      console.log(errorCode, errorMessage);
+    });
+  }
+}
+
+const loginCheckFB = () => {
+  return function (dispatch, getState, {history}) {
+    onAuthStateChanged(auth, (user) => {
+      if(user) {
+        dispatch(setUser({
+          id: user.email,
+          user_name: user.displayName,
+          user_profile: '',
+          uid: user.uid,
+        }));
+      } else {
+        dispatch(logOut());
+      }
+    });
+  }
+}
+
+const logoutFB = () => {
+  return function (dispatch, getState, {history}) {
+    signOut(auth).then(() => {
+      dispatch(logOut());
+      history.replace('/');
+    });
+  }
+}
+
 // reducer
 export default handleActions({
-  [LOG_IN]: (state, action) => produce(state, (draft) => {
+  [SET_USER]: (state, action) => produce(state, (draft) => {
     setCookie("is_login", "success");
     draft.user = action.payload.user;
     draft.is_login = true;
   }),
   [LOG_OUT]: (state, action) => produce(state, (draft) => {
-    
+    deleteCookie("is_login");
+    draft.user = null;
+    draft.is_login = false;
   }),
   [GET_USER]: (state, action) => produce(state, (draft) => {
     
@@ -36,9 +145,12 @@ export default handleActions({
 
 // action creator export
 const actionCreators = {
-  logIn,
   logOut,
   getUser,
+  signupFB,
+  loginFB,
+  loginCheckFB,
+  logoutFB,
 }
 
 export { actionCreators };
