@@ -24,7 +24,7 @@ const Image = (props) => {
 
   return (
     <>
-      
+      <ImageDefault {...styles}></ImageDefault>
     </>
   );
 };
@@ -34,6 +34,15 @@ Image.defaultProps = {
   src: "https://media.istockphoto.com/photos/dog-puppy-on-garden-picture-id1142412984?k=20&m=1142412984&s=170667a&w=0&h=VLomTUSZwXDrVauJrpiyMboe0Q7lUYYiMO89sFy2dgY=",
   size: 36,
 };
+
+const ImageDefault = styled.div`
+  --size: ${(props) => props.size}px;
+  width: var(--size);
+  height: var(--size);
+
+  background-image: url("${(props) => props.src}");
+  background-size: cover;
+`;
 
 const AspectOutter = styled.div`
   width: 100%;

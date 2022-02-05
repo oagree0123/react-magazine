@@ -7,6 +7,8 @@ import user from "./modules/user";
 import post from "./modules/post";
 import image from './modules/image'
 
+console.log(user);
+
 export const history = createBrowserHistory();
 
 const rootReducer = combineReducers({
