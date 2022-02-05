@@ -46,6 +46,7 @@ const AspectInner = styled.div`
   overflow: hidden;
   background-image: url("${(props) => props.src}");
   background-size: cover;
+  background-repeat: no-repeat;
 `;
 
 const ImageCircle = styled.div`
