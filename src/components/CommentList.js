@@ -1,22 +1,40 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, Grid, Text, Image } from '../elements';
+import { actionCreators as commentActions } from '../redux/modules/comment';
 
 const CommentList = (props) => {
+  const dispatch = useDispatch();
+  const comment_list = useSelector(state => state.comment.list);
+
+  const {post_id} = props;
+
+  useEffect(() => {
+    console.log(post_id);
+    if(!comment_list[post_id]) {
+      dispatch(commentActions.getCommentFB(post_id));
+    }
+  }, []);
+
+  if(!comment_list[post_id] || !post_id) {
+    return null;
+  }
+
   return (
     <>
       <Grid padding="16px">
-        <CommentItem />
-        <CommentItem />
-        <CommentItem />
-        <CommentItem />
-        <CommentItem />
-        <CommentItem />
-        <CommentItem />
-        <CommentItem />
+        {comment_list[post_id].map(c => {
+          console.log(c);
+          return <CommentItem key={c.id} {...c} />;
+        })}
       </Grid>
     </>
   );
+};
+
+CommentList.defaultProps = {
+  post_id: null,
 };
 
 const CommentItem = (props) => {

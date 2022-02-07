@@ -2,11 +2,14 @@ import { db } from "../../shared/firebase";
 import {
   collection, 
   getDocs,
+  getDoc,
   addDoc,
   query,
   orderBy,
   updateDoc,
   doc,
+  limit,
+  startAt,
 } from "firebase/firestore"
 import { 
   ref, 
@@ -24,15 +27,19 @@ import { actionCreators as imageActions } from "./image";
 const SET_POST = "SET_POST";
 const ADD_POST = "ADD_POST";
 const EDIT_POST = "EDIT_POST";
+const LOADING = "LOADING";
 
 // action creators
-const setPost = createAction(SET_POST, (post_list) => ({ post_list }));
+const setPost = createAction(SET_POST, (post_list, paging) => ({ post_list, paging }));
 const addPost = createAction(ADD_POST, (post) => ({ post }));
 const editPost = createAction(EDIT_POST, (post_id, post) => ({post_id, post}));
+const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
 // initialState
 const initialState = {
   list: [],
+  paging: {start: null, next: null, size: 3},
+  is_loading: false,
 };
 
 const initialPost = {
@@ -144,13 +151,34 @@ const addPostFB = (contents="") => {
   }
 };
 
-const getPostFB = () => {
+const getPostFB = (start=null, size=3) => {
   return async function (dispatch, getState, {history}) {
-    const postDB = query(collection(db, "post"), orderBy("insert_dt", "desc"));
-    /* const postDB = collection(db, "post"); */
+
+    let _paging = getState().post.paging;
+    if(_paging.start && !_paging.next){
+      return;
+    }
+
+    dispatch(loading(true));
+
+    let postDB = query(collection(db, "post"), orderBy("insert_dt", "desc"));
+    
+    if(start) {
+      postDB = query(postDB, startAt(start));
+    }
+
+    postDB = query(postDB, limit(size+1));
 
     const post_data = await getDocs(postDB);
     let post_list = [];
+
+    let paging = {
+      start: post_data.docs[0],
+      next: post_data.docs.length === size+1? 
+        post_data.docs[post_data.docs.length - 1] : 
+        null,
+      size : size,
+    }
 
     post_data.forEach((doc) => {
       let _post = doc.data();
@@ -171,22 +199,64 @@ const getPostFB = () => {
       post_list.push(post);
     });
 
-    dispatch(setPost(post_list));
+    post_list.pop();
+
+    dispatch(setPost(post_list, paging));
   }
 };
+
+const getOnePostFB = (id) => {
+  return function(dispatch, getState, {history}) {
+    const postDB = doc(db, "post", id);
+    getDoc(postDB).then(doc => {
+
+      let _post = doc.data();
+      let post_d = Object.keys(_post).reduce((acc, cur) => {
+        
+        if(cur.indexOf("user_") !== -1) {
+          return {
+            ...acc, 
+            user_info: {...acc.user_info, [cur]: _post[cur]},
+          };
+        }
+
+        return {...acc, [cur]: _post[cur]}
+      }, {id: doc.id, user_info: {}});
+
+      dispatch(setPost([post_d]));
+    });
+  }
+}
 
 // reducer
 export default handleActions({
   [SET_POST]: (state, action) => produce(state, (draft) => {
-    draft.list = action.payload.post_list;
+    draft.list.push(...action.payload.post_list);
+
+    draft.list = draft.list.reduce((acc, cur) => {
+      if(acc.findIndex(a => a.id === cur.id) === -1) {
+        return [...acc, cur];
+      } else {
+        acc[acc.findIndex(a => a.id === cur.id)] = cur;
+        return acc;
+      }
+    }, []);
+
+    if(action.payload.paging) {
+      draft.paging = action.payload.paging;
+    }
+    draft.is_loading = false;
   }),
   [ADD_POST]: (state, action) => produce(state, (draft) => {
     draft.list.unshift(action.payload.post);
   }),
   [EDIT_POST]: (state, action) => produce(state, (draft) => {
     let idx = draft.list.findIndex((p) => p.id === action.payload.post_id);
-
+    
     draft.list[idx] = {...draft.list[idx], ...action.payload.post};
+  }),
+  [LOADING]: (state, action) => produce(state, (draft) => {
+    draft.is_loading = action.payload.is_loading;
   }),
 }, initialState);
 
@@ -198,6 +268,7 @@ const actionCreators = {
   getPostFB,
   addPostFB,
   editPostFB,
+  getOnePostFB,
 }
 
 export { actionCreators };

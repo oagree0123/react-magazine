@@ -19,7 +19,15 @@ const Header = (props) => {
       <>
         <Grid is_flex padding="4px 16px">
           <Grid>
-            <Text margin="0px" size="24px" bold>매거진</Text>
+            <Text 
+            _onClick={() => {
+              history.replace('/');
+            }}
+            margin="0px" 
+            size="24px" 
+            bold>
+              매거진
+            </Text>
           </Grid>
   
           <Grid is_flex>
@@ -43,7 +51,16 @@ const Header = (props) => {
     <>
       <Grid is_flex padding="4px 16px">
         <Grid>
-          <Text margin="0px" size="24px" bold>매거진</Text>
+          <Text 
+            _onClick={() => {
+              history.replace('/');
+              window.location.reload();
+            }}
+            margin="0px" 
+            size="24px" 
+            bold>
+            매거진
+          </Text>
         </Grid>
 
         <Grid is_flex>

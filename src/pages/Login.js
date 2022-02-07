@@ -23,7 +23,7 @@ const Login = (props) => {
       return;
     }
 
-    dispatch(userActions.loginFB(id, pwd ));
+    dispatch(userActions.loginFB(id, pwd));
   }
 
   return (
@@ -32,6 +32,7 @@ const Login = (props) => {
         <Text size="32px" bold>로그인</Text>
         <Grid padding="16px 0px">
           <Input 
+            value={id}
             label="아이디"
             placeholder="아이디를 입력해주세요."
             _onChange={(e) => {
@@ -42,6 +43,7 @@ const Login = (props) => {
 
         <Grid padding="16px 0px">
           <Input 
+            value={pwd}
             label="비밀번호"
             placeholder="비밀번호를 입력해주세요."
             type="password"

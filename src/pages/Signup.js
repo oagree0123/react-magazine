@@ -38,6 +38,7 @@ const Signup = (props) => {
         <Text size="32px" bold>회원가입</Text>
         <Grid padding="16px 0px">
           <Input 
+            value={id}
             label="아이디"
             placeholder="아이디를 입력해주세요."
             _onChange={(e) => {
@@ -48,6 +49,7 @@ const Signup = (props) => {
         
         <Grid padding="16px 0px">
           <Input 
+            value={user_name}
             label="닉네임"
             placeholder="닉네임를 입력해주세요."
             _onChange={(e) => {
@@ -58,6 +60,7 @@ const Signup = (props) => {
         
         <Grid padding="16px 0px">
           <Input 
+            value={pwd}
             label="비밀번호"
             placeholder="비밀번호를 입력해주세요."
             type="password"
@@ -68,6 +71,7 @@ const Signup = (props) => {
         </Grid>
         <Grid padding="16px 0px">
           <Input 
+            value={pwd_check}
             label="비밀번호 확인"
             placeholder="비밀번호를 다시 입력해주세요."
             type="password"
