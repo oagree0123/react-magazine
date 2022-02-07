@@ -52,6 +52,7 @@ const initialPost = {
   contents: "",
   comment_cnt: 0,
   insert_dt: moment().format("YYYY-MM-DD HH:mm:ss"),
+  post_type: "normal",
 };
 
 // middleware actions
@@ -100,7 +101,7 @@ const editPostFB = (post_id=null, post={}) => {
   }
 };
 
-const addPostFB = (contents="") => {
+const addPostFB = (contents="", type_check="normal") => {
   return async function (dispatch, getState, {history}) {
     const _user = getState().user.user;
     
@@ -114,6 +115,7 @@ const addPostFB = (contents="") => {
       ...initialPost,
       contents: contents,
       insert_dt: moment().format("YYYY-MM-DD HH:mm:ss"),
+      post_type: type_check,
     };
 
     const _image = getState().image.preview;

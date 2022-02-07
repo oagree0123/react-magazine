@@ -29,7 +29,6 @@ const PostList = (props) => {
       {/* <Post /> */}
       <InfinityScroll
         callNext={() => {
-          console.log("아니면 여기?");
           dispatch(postActions.getPostFB(paging.next));
         }}
         is_next={paging.next? true : false}

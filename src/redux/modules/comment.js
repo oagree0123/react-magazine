@@ -5,13 +5,19 @@ import {
   orderBy, 
   query, 
   updateDoc, 
-  where,
   increment,
   doc,
+  where,
 } from "firebase/firestore";
+import { 
+  ref,
+  set,
+  update,
+  push,
+} from "firebase/database";
 import { createAction, handleActions } from "redux-actions";
 import { produce } from "immer";
-import { db } from "../../shared/firebase";
+import { db, realtime } from "../../shared/firebase";
 import "moment";
 import moment from "moment";
 
@@ -38,8 +44,11 @@ const getCommentFB = (post_id) => {
       if(!post_id) {
         return; 
       }
-
-      const commentDB = query(collection(db, "comment"), orderBy("insert_dt", "desc"));
+      const docRef = collection(db, "comment")
+      const commentDB = query(
+        docRef, 
+        where("post_id", "==", post_id),
+        orderBy("insert_dt", "desc"));
 
       let comment_Data = await getDocs(commentDB)
       
@@ -48,8 +57,6 @@ const getCommentFB = (post_id) => {
       comment_Data.forEach((doc) => {
         list.push({...doc.data(), id: doc.id});
       });
-
-      console.log(list);
 
       dispatch(setComment(post_id, list));
     }
@@ -81,7 +88,27 @@ const addCommentFB = (post_id, contents) => {
         dispatch(addComment(post_id, comment))
 
         if(post) {
-          dispatch(postActions.editPost(post_id, {comment_cnt: parseInt(post.comment_cnt) + 1 }));
+          dispatch(
+            postActions.editPost(post_id, {
+              comment_cnt: parseInt(post.comment_cnt) + 1 
+            })
+          );
+
+          const notiDB = ref(realtime, `noti/${post.user_info.user_id}`);
+
+          const _noti_item = ref(realtime, 
+            `noti/${post.user_info.user_id}/list`);
+          
+          push(_noti_item, {
+            post_id: post.id,
+            user_name: comment.user_name,
+            image_url: post.image_url,
+            insert_dt: comment.insert_dt,
+          }).catch(err => {
+            console.log(err);
+          });
+
+          update(notiDB, {read:false});
         }
       });
     });

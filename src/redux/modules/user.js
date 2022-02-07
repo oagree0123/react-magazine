@@ -56,7 +56,7 @@ const loginFB = (id, pwd) => {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-
+        window.alert("아이디와 비밀번호를 다시 확인해주세요!")
         console.log(errorCode, errorMessage);
       });
     })

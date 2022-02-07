@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { Grid, Text, Button, Image, Input } from '../elements'
+import { Grid, Text, Button, Image, Input, Radio } from '../elements';
 import Upload from '../shared/Upload';
 import { actionCreators as postActions } from '../redux/modules/post';
 import { actionCreators as imageActions } from '../redux/modules/image';
@@ -20,6 +20,7 @@ const PostWrite = (props) => {
   let _post = is_edit? post_list.find((p) => p.id === post_id) : null;
 
   const [contents, setContents] = useState(_post? _post.contents : "");
+  const [type_check, setTypeCheck] = useState();
 
   useEffect(() => {
     if(is_edit && !_post) {
@@ -37,7 +38,7 @@ const PostWrite = (props) => {
   }
 
   const addPost = () => {
-    dispatch(postActions.addPostFB(contents));
+    dispatch(postActions.addPostFB(contents, type_check));
   };
 
   const editPost = () => {
@@ -53,6 +54,7 @@ const PostWrite = (props) => {
       </Grid>
     );
   }
+
   return (
     <>
       <Grid padding="16px">
@@ -60,6 +62,12 @@ const PostWrite = (props) => {
           {is_edit ? "게시글 수정" : "게시글 작성"}
         </Text>
         <Upload />
+      </Grid>
+
+      <Grid is_flex padding="8px 16px">
+        <Radio name="post_type" value="left" label="왼쪽정렬" _onChange={()=> {setTypeCheck("left")}} />
+        <Radio name="post_type" value="right" label="오른쪽정렬" _onChange={()=> {setTypeCheck("right")}} />
+        <Radio name="post_type" value="normal" label="기본정렬" _onChange={()=> {setTypeCheck("normal")}} />
       </Grid>
 
       <Grid>

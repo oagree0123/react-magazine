@@ -11,7 +11,6 @@ const CommentList = (props) => {
   const {post_id} = props;
 
   useEffect(() => {
-    console.log(post_id);
     if(!comment_list[post_id]) {
       dispatch(commentActions.getCommentFB(post_id));
     }
@@ -25,7 +24,6 @@ const CommentList = (props) => {
     <>
       <Grid padding="16px">
         {comment_list[post_id].map(c => {
-          console.log(c);
           return <CommentItem key={c.id} {...c} />;
         })}
       </Grid>
