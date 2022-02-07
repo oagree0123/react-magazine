@@ -41,9 +41,7 @@ const PostList = (props) => {
                 margin={"0px 0px 20px 0px"}
                 bg={"#fff"}
                 key={idx} 
-                _onClick={() => {
-                history.push(`/post/${p.id}`)
-              }}>
+              >
                 <Post {...p} is_me />
               </Grid>
             );
