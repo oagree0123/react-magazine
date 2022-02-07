@@ -10,6 +10,7 @@ import { Badge } from "@material-ui/core";
 import NotificationsIcon from '@material-ui/icons/Notifications';
 
 import { realtime } from "../shared/firebase";
+import styled from 'styled-components';
 
 const NotiBadge = (props) => {
   const user_id = useSelector(state => state.user.user.uid);
@@ -32,21 +33,31 @@ const NotiBadge = (props) => {
   }, [])
 
   return (
-    <>
+    <NotiButton onClick={notiCheck}>
       <Badge 
         color="secondary" 
         variant="dot" 
         invisible={is_read} 
-        onClick={notiCheck}
       >
         <NotificationsIcon />
       </Badge>
-    </>
+    </NotiButton>
   );
 };
 
 NotiBadge.defaultProps = {
   _onClick: () => {},
 }
+
+const NotiButton = styled.button`
+  margin-right: 4px;
+  padding: 0px 0px;
+  width: 100%;
+  height: 42px;
+  box-sizing: border-box;
+  border: none;
+  color: white;
+  background-color: #212121;
+`;
 
 export default NotiBadge;
