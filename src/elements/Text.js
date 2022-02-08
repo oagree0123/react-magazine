@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Text = (props) => {
-  const {bold, color, size, children, margin, _onClick, center} = props;
+  const {bold, color, size, children, margin, _onClick, center, is_cursor} = props;
 
   const styles = {
     margin: margin,
@@ -10,6 +10,7 @@ const Text = (props) => {
     color: color,
     size: size,
     center: center,
+    is_cursor: is_cursor,
   }
 
   return (
@@ -27,6 +28,7 @@ Text.defaultProps = {
   margin: false,
   _onClick: () => {},
   center: false,
+  is_cursor: false,
 }
 
 const P = styled.p`
@@ -35,6 +37,7 @@ const P = styled.p`
   font-weight: ${(props) => (props.bold? "600" : "400")};
   ${(props) => (props.margin? `margin: ${props.margin};` : '')}
   ${(props) => (props.center? `text-align: center;` : '')}
+  ${(props) => (props.is_cursor? `cursor: pointer;` : '')}
 `;
 
 export default Text;

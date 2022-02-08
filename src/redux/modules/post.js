@@ -27,12 +27,14 @@ import { actionCreators as imageActions } from "./image";
 const SET_POST = "SET_POST";
 const ADD_POST = "ADD_POST";
 const EDIT_POST = "EDIT_POST";
+const DELETE_POST = "EDIT_POST";
 const LOADING = "LOADING";
 
 // action creators
 const setPost = createAction(SET_POST, (post_list, paging) => ({ post_list, paging }));
 const addPost = createAction(ADD_POST, (post) => ({ post }));
 const editPost = createAction(EDIT_POST, (post_id, post) => ({post_id, post}));
+const deletePost = createAction(DELETE_POST, (post) => ({post}));
 const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
 // initialState

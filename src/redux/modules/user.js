@@ -9,9 +9,11 @@ import {
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
+import { setDoc, doc, collection } from 'firebase/firestore';
 
-import { auth } from '../../shared/firebase';
+import { auth, db } from '../../shared/firebase';
 import { setCookie, getCookie, deleteCookie } from "../../shared/Cookie"
+import { actionCreators as likeActions } from './like';
 
 // actions
 const LOG_OUT = "LOG_OUT";
@@ -50,7 +52,7 @@ const loginFB = (id, pwd) => {
           user_profile: '',
           uid: user.user.uid,
         }));
-
+        dispatch(likeActions.getLikeFB());
         history.push('/');
       })
       .catch((error) => {
@@ -75,7 +77,7 @@ const signupFB = (id, pwd, user_name) => {
     createUserWithEmailAndPassword(auth, id, pwd)
     .then((user) => {
       console.log(user);
-      
+      let user_uid = user.user.uid
       updateProfile(auth.currentUser, {
         displayName: user_name,
       }).then(() => {
@@ -85,11 +87,14 @@ const signupFB = (id, pwd, user_name) => {
           user_profile: '',
           uid: user.user.uid,
         }));
+
         history.push('/');
       }).catch((error) => {
         console.log(error);
       });
-
+      console.log(user_uid);
+      const docRef = doc(db, "like", user_uid);
+      setDoc(docRef, {liked: []});
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -122,6 +127,8 @@ const logoutFB = () => {
     signOut(auth).then(() => {
       dispatch(logOut());
       history.replace('/');
+    }).then(() =>{
+      dispatch(likeActions.getLikeFB());
     });
   }
 }

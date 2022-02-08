@@ -26,13 +26,14 @@ const PostDetail = (props) => {
   const post_idx = post_list.findIndex(p => p.id === id);
 
   const post = post_list[post_idx];
+  console.log(id);
 
   useEffect(() => {
     if(post) {
       return ;
     }
-    
     dispatch(postActions.getOnePostFB(id));
+    console.log("하나가져오기");
   }, [])
 
   return (

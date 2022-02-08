@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import Post from '../components/Post';
 import { actionCreators as postActions } from '../redux/modules/post';
+import { actionCreators as likeActions } from "../redux/modules/like";
 import InfinityScroll from '../shared/InfinityScroll';
 import { Grid } from '../elements';
 
@@ -10,19 +11,21 @@ const PostList = (props) => {
   const dispatch = useDispatch();
   
   const user_info = useSelector((state) => state.user.user);
-
   const post_list = useSelector((state) => state.post.list);
-  const is_loading =  useSelector((state) => state.post.is_loading);
+  const is_loading = useSelector((state) => state.post.is_loading);
   const paging = useSelector((state) => state.post.paging);
 
   const { history } = props;
-
+  
   useEffect(() => {
+    
     if(post_list.length < 2) {
-      dispatch(postActions.getPostFB());
-    }
+      dispatch(postActions.getPostFB()).then(() => {
+        dispatch(likeActions.getLikeFB());
+      });
+    } 
   },[])
-
+  
   return (
     <>
       <Grid bg={"#EFF6FF"} padding="20px 0px 0px 0px">
@@ -51,9 +54,7 @@ const PostList = (props) => {
                 margin={"0px 0px 20px 0px"}
                 bg={"#fff"}
                 key={idx} 
-                _onClick={() => {
-                history.push(`/post/${p.id}`)
-              }}>
+              >
                 <Post {...p} />
               </Grid>
             );

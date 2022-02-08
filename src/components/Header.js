@@ -32,11 +32,11 @@ const Header = (props) => {
           </Grid>
   
           <Grid is_flex>
-              <NotiBadge 
-                _onClick={() => {
-                  history.push('/noti');
-                }}
-                />
+            <NotiBadge 
+              _onClick={() => {
+                history.push('/noti');
+              }}
+            />
             <Button 
               text="로그아웃"
               _onClick={() => {

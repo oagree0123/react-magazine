@@ -1,9 +1,14 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 import {Grid, Image, Text, Button} from '../elements';
 import { history } from '../redux/configStroe';
+import LikeButton from './LikeButton';
+import UnlikeButton from './UnlikeButton';
 
 const Post = (props) => {
+  const like_data = useSelector((state) => state.like.list);
+
   return (
     <>
       <Grid>
@@ -22,10 +27,17 @@ const Post = (props) => {
             }}>
               수정
             </Button>}
+            {props.is_me && 
+            <Button Zindex="100" width="auto" margin="4px" padding="4px" _onClick={() => {
+              console.log("삭제");
+            }}>
+              삭제
+            </Button>}
           </Grid>
 
         </Grid>
-        <Grid _onClick={() => {history.push(`/post/${props.id}`)}}>
+        
+        <Grid is_cursor _onClick={() => {history.push(`/post/${props.id}`)}}>
         {
           (props.post_type === "left") ?
             (
@@ -62,20 +74,18 @@ const Post = (props) => {
               </Grid>
             </Grid>
             )
-        }
-          
-        
-        {/* <Grid padding="16px">
-          <Text>{props.contents}</Text>
+        } 
         </Grid>
 
-        <Grid>
-          <Image shape="rectangle" src={props.image_url} />
-        </Grid> */}
-
-        <Grid padding="16px">
-          <Text margin="0px" bold>댓글 {props.comment_cnt}개</Text>
-        </Grid>
+        <Grid is_flex padding="16px">
+          <Text _onClick={() => {history.push(`/post/${props.id}`)}} margin="0px" is_cursor bold>
+            댓글 {props.comment_cnt}개
+          </Text>
+          {
+            like_data?.liked ?
+            <LikeButton liked={like_data.liked} post_id={props.id} /> :
+            <UnlikeButton post_id={props.id} />
+          }
         </Grid>
       </Grid>
     </>

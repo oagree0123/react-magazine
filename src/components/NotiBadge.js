@@ -26,7 +26,7 @@ const NotiBadge = (props) => {
     const notiDB = ref(realtime, `noti/${user_id}`);
 
     onValue(notiDB, (snapshot) => {
-      setIsRead(snapshot.val().read);
+      setIsRead(snapshot.val()?.read);
     });
 
     return () => off(notiDB);
@@ -58,6 +58,7 @@ const NotiButton = styled.button`
   border: none;
   color: white;
   background-color: #212121;
+  cursor: pointer;
 `;
 
 export default NotiBadge;
