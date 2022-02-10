@@ -1,13 +1,20 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {Grid, Image, Text, Button} from '../elements';
 import { history } from '../redux/configStroe';
 import LikeButton from './LikeButton';
 import UnlikeButton from './UnlikeButton';
+import { actionCreators as postActions } from '../redux/modules/post';
 
 const Post = (props) => {
+  const dispatch = useDispatch();
   const like_data = useSelector((state) => state.like.list);
+  const is_login = useSelector((state) => state.user.is_login);
+
+  const postDelete = () => {
+    dispatch(postActions.deletePostFB(props.id));
+  }
 
   return (
     <>
@@ -22,15 +29,13 @@ const Post = (props) => {
           <Grid is_flex width="auto">
             <Text>{props.insert_dt}</Text>
             {props.is_me && 
-            <Button Zindex="100" width="auto" margin="4px" padding="4px" _onClick={() => {
+            <Button width="auto" margin="4px" padding="4px" _onClick={() => {
               history.push(`/write/${props.id}`);
             }}>
               수정
             </Button>}
             {props.is_me && 
-            <Button Zindex="100" width="auto" margin="4px" padding="4px" _onClick={() => {
-              console.log("삭제");
-            }}>
+            <Button width="auto" margin="4px" padding="4px" _onClick={postDelete}>
               삭제
             </Button>}
           </Grid>
@@ -78,14 +83,21 @@ const Post = (props) => {
         </Grid>
 
         <Grid is_flex padding="16px">
-          <Text _onClick={() => {history.push(`/post/${props.id}`)}} margin="0px" is_cursor bold>
-            댓글 {props.comment_cnt}개
-          </Text>
+          <Grid>
+            <Text _onClick={() => {history.push(`/post/${props.id}`)}} margin="0px" is_cursor bold>
+              댓글 {props.comment_cnt}개
+            </Text>
+          </Grid>
+          <Grid is_justify="flex-end">
           {
             like_data?.liked ?
             <LikeButton liked={like_data.liked} post_id={props.id} /> :
             <UnlikeButton post_id={props.id} />
           }
+          <Text bold>
+            {props.like_cnt}개
+          </Text>
+          </Grid>
         </Grid>
       </Grid>
     </>

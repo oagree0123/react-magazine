@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Button = (props) => {
-  const { text, _onClick, is_float, children, margin, width, padding, Zindex } = props;
+  const { text, _onClick, is_float, children, margin, width, padding, Zindex, is_disable } = props;
 
 
   if(is_float) {
@@ -22,7 +22,10 @@ const Button = (props) => {
 
   return (
     <>
-      <ElButton {...styles} onClick={_onClick}>{text? text : children}</ElButton>
+      {is_disable ?
+      <ElButton {...styles} onClick={_onClick}>{text? text : children}</ElButton> :
+      <ElDisableButton {...styles} onClick={_onClick} disabled>{text? text : children}</ElDisableButton> 
+      }
     </>
   );
 };
@@ -36,6 +39,7 @@ Button.defaultProps = {
   padding: '12px 0px',
   width: '100%',
   Zindex: false,
+  is_disable: true,
 }
 
 const ElButton = styled.button`
@@ -48,6 +52,17 @@ const ElButton = styled.button`
   ${(props) => (props.margin? `margin: ${props.margin};` : '')};
   ${(props) => (props.Zindex? `z-index: ${props.Zindex};` : '')};
   cursor: pointer;
+`;
+
+const ElDisableButton = styled.button`
+  width: ${(props) => props.width};
+  color: #fff;
+  background-color: #dddddd;
+  padding: ${(props) => props.padding};
+  box-sizing: border-box;
+  border: none;
+  ${(props) => (props.margin? `margin: ${props.margin};` : '')};
+  ${(props) => (props.Zindex? `z-index: ${props.Zindex};` : '')};
 `;
 
 const FloatButton = styled.button`

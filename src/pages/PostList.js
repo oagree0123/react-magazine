@@ -18,8 +18,7 @@ const PostList = (props) => {
   const { history } = props;
   
   useEffect(() => {
-    
-    if(post_list.length < 2) {
+    if(post_list.length < 3) {
       dispatch(postActions.getPostFB()).then(() => {
         dispatch(likeActions.getLikeFB());
       });

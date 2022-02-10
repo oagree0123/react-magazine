@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Button, Grid, Input, Text } from '../elements';
@@ -11,7 +11,16 @@ const Login = (props) => {
 
   const [id, setId] = useState('');
   const [pwd, setPwd] = useState('');
+  const [is_disable, setIsDisable] = useState(false);
 
+  useEffect(() => {
+    if((!id) || (!pwd)) {
+      setIsDisable(false);
+    } else{
+      setIsDisable(true);
+    }
+  }, [id, pwd])
+  
   const login = () => {
     if(id === "" || pwd === "") {
       alert("로그인 정보를 입력해주세요!");
@@ -56,6 +65,7 @@ const Login = (props) => {
         </Grid>
 
         <Button 
+          is_disable={is_disable}
           text="로그인하기" 
           _onClick={login}>
         </Button>

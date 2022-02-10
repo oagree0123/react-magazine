@@ -9,10 +9,16 @@ import {
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
-import { setDoc, doc, collection } from 'firebase/firestore';
+import { setDoc, doc, updateDoc, addDoc } from 'firebase/firestore';
+import {
+  ref,
+  child,
+  push,
+  update,
+} from "firebase/database";
 
-import { auth, db } from '../../shared/firebase';
-import { setCookie, getCookie, deleteCookie } from "../../shared/Cookie"
+import { auth, db, realtime } from '../../shared/firebase';
+import { setCookie, deleteCookie } from "../../shared/Cookie"
 import { actionCreators as likeActions } from './like';
 
 // actions
@@ -81,20 +87,26 @@ const signupFB = (id, pwd, user_name) => {
       updateProfile(auth.currentUser, {
         displayName: user_name,
       }).then(() => {
-        dispatch(setUser({
+        dispatch(getUser({
           id: id,
           user_name: user_name,
           user_profile: '',
           uid: user.user.uid,
         }));
 
+        console.log(user_uid);
+        const docRef = doc(db, "like", user_uid);
+        setDoc(docRef, {liked: []});
+
+        const notiDB = ref(realtime, `noti/${user.user.uid}`);
+        update(notiDB, {
+          read: true
+        })
+
         history.push('/');
       }).catch((error) => {
         console.log(error);
       });
-      console.log(user_uid);
-      const docRef = doc(db, "like", user_uid);
-      setDoc(docRef, {liked: []});
     })
     .catch((error) => {
       const errorCode = error.code;

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Grid = (props) => {
-  const { is_flex, is_left, is_right, width, margin, padding, bg, children, center, _onClick, is_cursor } = props;
+  const { is_flex, is_left, is_right, width, margin, padding, bg, children, center, _onClick, is_cursor, is_justify } = props;
 
   const styles = {
     is_flex: is_flex,
@@ -14,6 +14,7 @@ const Grid = (props) => {
     bg: bg,
     center: center,
     is_cursor: is_cursor,
+    is_justify: is_justify,
   };
 
   return (
@@ -37,6 +38,7 @@ Grid.defaultProps = {
   center: false,
   _onClick: () => {},
   is_cursor: false,
+  is_justify: false,
 };
 
 const GridBox = styled.div`
@@ -57,6 +59,10 @@ const GridBox = styled.div`
   ${(props) => 
     props.is_right
       ? `display: flex; align-items: center; justify-content: reverse-start; `
+      : ""}
+  ${(props) => 
+    props.is_justify
+      ? `display: flex; align-items: center; justify-content: ${props.is_justify}; `
       : ""}
   ${(props) => props.center ? `text-align: center;` : ""}
   ${(props) => props.is_cursor ? `cursor: pointer;` : ""}

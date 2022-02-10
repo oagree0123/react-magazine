@@ -10,6 +10,7 @@ import {
   doc,
   limit,
   startAt,
+  deleteDoc,
 } from "firebase/firestore"
 import { 
   ref, 
@@ -27,14 +28,14 @@ import { actionCreators as imageActions } from "./image";
 const SET_POST = "SET_POST";
 const ADD_POST = "ADD_POST";
 const EDIT_POST = "EDIT_POST";
-const DELETE_POST = "EDIT_POST";
+const DELETE_POST = "DELETE_POST";
 const LOADING = "LOADING";
 
 // action creators
 const setPost = createAction(SET_POST, (post_list, paging) => ({ post_list, paging }));
 const addPost = createAction(ADD_POST, (post) => ({ post }));
 const editPost = createAction(EDIT_POST, (post_id, post) => ({post_id, post}));
-const deletePost = createAction(DELETE_POST, (post) => ({post}));
+const deletePost = createAction(DELETE_POST, (post_index) => ({post_index}));
 const loading = createAction(LOADING, (is_loading) => ({ is_loading }));
 
 // initialState
@@ -53,11 +54,33 @@ const initialPost = {
   image_url: "https://post-phinf.pstatic.net/MjAyMTA1MDJfMTAy/MDAxNjE5OTI1MTk0MjY5.DbBM3YQvmKzPaenGwlVVfUWmSdsOsCws1wIMtazZ03Yg.dDuT0dHkmo87TQDkZs0fx4-n3mrWzhTz_jh7ImSaA3Ug.JPEG/IMG_2536.jpg?type=w1200",
   contents: "",
   comment_cnt: 0,
+  like_cnt: 0,
   insert_dt: moment().format("YYYY-MM-DD HH:mm:ss"),
   post_type: "normal",
 };
 
 // middleware actions
+const deletePostFB = (post_id) => {
+  return async function(dispatch, getState, {history}) {
+    if(!post_id) {
+      console.log("게시물 정보가 없어요!");
+      return;
+    }
+
+    const _post = getState().post.list;
+    
+    const docRef = doc(db, "post", post_id);
+    await deleteDoc(docRef);
+
+    const post_index = _post.findIndex((v) => {
+      return v.id === post_id;
+    });
+
+    dispatch(deletePost(post_index));
+    history.replace('/');
+  }
+}
+
 const editPostFB = (post_id=null, post={}) => {
   return async function (dispatch, getState, {history}) {
 
@@ -65,6 +88,7 @@ const editPostFB = (post_id=null, post={}) => {
       console.log("게시물 정보가 없어요!");
       return;
     }
+    
     const _image = getState().image.preview;
     const _post_idx = getState().post.list.findIndex(p => p.id === post_id);
     const _post = getState().post.list[_post_idx];
@@ -121,7 +145,6 @@ const addPostFB = (contents="", type_check="normal") => {
     };
 
     const _image = getState().image.preview;
-    console.log(_image);
 
     const storageRef = ref(storage, `images/${user_info.user_id}_${new Date().getTime()}`);
     const _upload = uploadString(storageRef, _image, 'data_url');
@@ -134,8 +157,8 @@ const addPostFB = (contents="", type_check="normal") => {
         console.log(url);
 
         return url;
-      }).then((url) => {
-        const docRef = addDoc(collection(db, "post"), {...user_info, ..._post, image_url: url});
+      }).then(async (url) => {
+        const docRef = await addDoc(collection(db, "post"), {...user_info, ..._post, image_url: url});
         const post_data = { id: docRef.id, user_info, ..._post, image_url: url }
 
         dispatch(addPost(post_data));
@@ -155,7 +178,7 @@ const addPostFB = (contents="", type_check="normal") => {
   }
 };
 
-const getPostFB = (start=null, size=3) => {
+const getPostFB = (start=null, size=4) => {
   return async function (dispatch, getState, {history}) {
 
     let _paging = getState().post.paging;
@@ -203,7 +226,9 @@ const getPostFB = (start=null, size=3) => {
       post_list.push(post);
     });
 
-    post_list.pop();
+    if(paging.next !== null){
+      post_list.pop();
+    }
 
     dispatch(setPost(post_list, paging));
   }
@@ -256,8 +281,15 @@ export default handleActions({
   }),
   [EDIT_POST]: (state, action) => produce(state, (draft) => {
     let idx = draft.list.findIndex((p) => p.id === action.payload.post_id);
-    
     draft.list[idx] = {...draft.list[idx], ...action.payload.post};
+    console.log(idx, action.payload.post)
+  }),
+  [DELETE_POST]: (state, action) => produce(state, (draft) => {
+    const new_post_list = draft.list.filter((v, i) => {
+      return parseInt(action.payload.post_index) !== i;
+    })
+
+    draft.list = new_post_list;
   }),
   [LOADING]: (state, action) => produce(state, (draft) => {
     draft.is_loading = action.payload.is_loading;
@@ -272,6 +304,7 @@ const actionCreators = {
   getPostFB,
   addPostFB,
   editPostFB,
+  deletePostFB,
   getOnePostFB,
 }
 

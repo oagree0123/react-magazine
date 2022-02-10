@@ -16,7 +16,7 @@ const InfinityScroll = (props) => {
     const scrollTop = (document.documentElement 
       && document.documentElement.scrollTop) ||
       document.body.scrollTop;
-    
+      
     if(scrollHeight - innerHeight - scrollTop < 200) {
       callNext();
     }
